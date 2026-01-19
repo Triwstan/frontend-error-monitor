@@ -1,0 +1,104 @@
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Error Monitor</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+        #log-container { background: #f4f4f4; padding: 15px; border-radius: 5px; max-height: 400px; overflow-y: auto; border: 1px solid #ddd; }
+        .error-entry { color: #d9534f; border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 5px; }
+        .error-entry small { color: #555; display: block; }
+        button { padding: 10px 15px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <h1>Error Monitor Demo</h1>
+    <button onclick="causeError()">Trigger Reference Error</button>
+    <button onclick="causePromiseRejection()">Trigger Promise Rejection</button>
+
+    <h3>Error Logs:</h3>
+    <div id="log-container"></div>
+
+    <script>
+        /**
+         * Error Monitor Configuration
+         */
+        const ErrorMonitor = {
+            apiUrl: 'https://api.example.com/logs', // Replace with your endpoint
+            logs: [],
+
+            init() {
+                // Catch Global JS Errors
+                window.onerror = (message, source, lineno, colno, error) => {
+                    this.handleError({
+                        type: 'JavaScript Error',
+                        message,
+                        source,
+                        line: lineno,
+                        column: colno,
+                        stack: error ? error.stack : null
+                    });
+                };
+
+                // Catch Unhandled Promise Rejections
+                window.onunhandledrejection = (event) => {
+                    this.handleError({
+                        type: 'Unhandled Rejection',
+                        message: event.reason.message || event.reason,
+                        stack: event.reason.stack || null
+                    });
+                };
+
+                console.log("Error Monitor Initialized.");
+            },
+
+            handleError(errorData) {
+                errorData.timestamp = new Date().toISOString();
+                errorData.userAgent = navigator.userAgent;
+
+                this.logs.push(errorData);
+                this.renderToUI(errorData);
+                this.reportToServer(errorData);
+            },
+
+            reportToServer(data) {
+                // Use sendBeacon for reliability during page unloads, or fetch for standard logging
+                if (navigator.sendBeacon) {
+                    navigator.sendBeacon(this.apiUrl, JSON.stringify(data));
+                } else {
+                    fetch(this.apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    }).catch(err => console.warn('Logging failed', err));
+                }
+            },
+
+            renderToUI(data) {
+                const container = document.getElementById('log-container');
+                const entry = document.createElement('div');
+                entry.className = 'error-entry';
+                entry.innerHTML = `
+                    <strong>[${data.type}]</strong> ${data.message}
+                    <small>${data.timestamp} | ${data.source || 'N/A'}:${data.line || ''}</small>
+                `;
+                container.prepend(entry);
+            }
+        };
+
+        // Initialize Monitor
+        ErrorMonitor.init();
+
+        // --- Demo Functions ---
+        function causeError() {
+            // Intentionally calling an undefined function
+            nonExistentFunction();
+        }
+
+        function causePromiseRejection() {
+            Promise.reject(new Error("Async operation failed"));
+        }
+    </script>
+</body>
+</html>
