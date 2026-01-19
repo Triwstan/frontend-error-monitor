@@ -1,4 +1,4 @@
-# Frontend Error Monitor 🚨
+# Frontend Error Monitor 
 
 A production-style **frontend error monitoring system** built with React.  
 This project captures runtime errors, promise rejections, and network failures, then displays them in an admin-style dashboard for analysis.
