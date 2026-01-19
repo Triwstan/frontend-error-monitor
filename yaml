@@ -1,0 +1,60 @@
+
+---
+
+##  Error Types Captured
+
+| Type | Description |
+|----|----|
+| JS_ERROR | Runtime JavaScript exceptions |
+| PROMISE_REJECTION | Unhandled async failures |
+| NETWORK_ERROR | Failed HTTP requests |
+
+---
+
+## Dashboard Capabilities
+
+- View all captured errors
+- Filter by error type
+- Search error messages
+- View timestamps & browser info
+- Export logs for debugging
+
+---
+
+##  Demo Mode
+
+The app includes buttons to:
+- Trigger JS errors
+- Trigger Promise rejections
+- Trigger Network failures
+
+Perfect for live demos and testing.
+
+---
+
+## Tech Stack
+
+- React (Vite)
+- Tailwind CSS
+- Chart.js
+- LocalStorage (IndexedDB-ready)
+- Modern ES6+
+
+---
+
+##  Roadmap
+
+- IndexedDB support
+- Remote server sync
+- Authentication
+- Alert notifications
+- Error deduplication
+- Session tracking
+
+---
+
+## Installation
+
+```bash
+npm install
+npm run dev
